@@ -51,6 +51,7 @@ void Simulation(int v) {
 }
 
 void KeyBoardColorChange(unsigned char key, int x, int y) {
+    // смена цвета обьекта
     if (++currColor == colorsCount) { currColor = 0; }
 }
 
