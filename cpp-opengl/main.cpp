@@ -2,16 +2,27 @@
 #include <Windows.h>
 #include <gl/gl.h>
 #include <gl/GLU.h>
-#include "include/GL/freeglut.h"
+#include "GL//freeglut.h"
+#include "GraphicObject.h"
 
-const int colorsCount = 4;
-float colors[colorsCount][3]{
-    {0, 0, 0},
-    {1, 1, 1},
-    {0, 0, 1},
-    {1, 0, 0}
+const int graphicObjectsCount = 4;
+GraphicObject graphicObjects[4];
+
+vec3 colors[graphicObjectsCount]{
+    vec3(0, 0, 0),
+    vec3(1, 1, 1),
+    vec3(0, 0, 1),
+    vec3(1, 0, 0)
 };
-int currColor = 0;
+
+vec3 positions[graphicObjectsCount]{
+    vec3(3, 0, 0),
+    vec3(-3, 0, 0),
+    vec3(0, 0, 3),
+    vec3(0, 0, -3)
+};
+
+float angles[graphicObjectsCount] {180, 0, 90, 270};
 
 void Display() {
     // Очистка буффера цвета 
@@ -24,11 +35,13 @@ void Display() {
     // Установка камеры
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(5, 5, 7.5, 0, 0, 0, 0, 1, 0);
+    gluLookAt(10, 10, 15, 0, 0, 0, 0, 1, 0);
 
-    // Отрисовка чайника 
-    glColor3f(colors[currColor][0], colors[currColor][1], colors[currColor][2]);
-    glutWireTeapot(1.0);
+    // Выводим чайники
+    for (size_t i = 0; i < graphicObjectsCount; i++)
+    {
+        graphicObjects[i].draw();
+    }
 
     // Смена переднего и заднего буффера
     glutSwapBuffers();
@@ -50,22 +63,28 @@ void Simulation(int v) {
     glutTimerFunc(20, Simulation, 0);
 }
 
-void KeyBoardColorChange(unsigned char key, int x, int y) {
-    // смена цвета обьекта
-    if (++currColor == colorsCount) { currColor = 0; }
+void KeyBoardFunc(unsigned char key, int x, int y) {
+    printf("Key code: %i\n", (unsigned int)key);
 }
 
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
     glutInitWindowPosition(200, 200);
-    glutInitWindowSize(400, 400);
-    glutCreateWindow("lab1");
+    glutInitWindowSize(700, 600);
+    glutCreateWindow("lab2");
     
     glutDisplayFunc(Display);
     glutReshapeFunc(Reshape);
-    glutKeyboardFunc(KeyBoardColorChange);
+    glutKeyboardFunc(KeyBoardFunc);
     glutTimerFunc(20, Simulation, 0);
+
+    for (size_t i = 0; i < graphicObjectsCount; i++)
+    {
+        graphicObjects[i].setAngle(angles[i]);
+        graphicObjects[i].setPosition(positions[i]);
+        graphicObjects[i].setColor(colors[i]);
+    }
 
     glutMainLoop();
 
